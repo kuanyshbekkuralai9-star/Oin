@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Шахмат викторинасы</title>
+<style>
+*{box-sizing:border-box;margin:0}
+body{min-height:100vh;font-family:"Trebuchet MS","Segoe UI",Verdana,Arial,sans-serif;color:#fff;font-size:18px;line-height:1.45;background:radial-gradient(circle at 80% 8%,#fff6c9 0 5%,#ffe58a 6%,transparent 14%),linear-gradient(#17106b,#3a1d8f 60%,#1d1470);overflow-x:hidden;padding:18px 12px 50px;position:relative}
+.st{position:fixed;inset:0;pointer-events:none;background:radial-gradient(2px 2px at 12% 20%,#fff,transparent),radial-gradient(2px 2px at 30% 60%,#fff,transparent),radial-gradient(3px 3px at 55% 15%,#fff,transparent),radial-gradient(2px 2px at 70% 70%,#fff,transparent),radial-gradient(2px 2px at 90% 40%,#fff,transparent),radial-gradient(2px 2px at 8% 85%,#fff,transparent),radial-gradient(3px 3px at 45% 90%,#fff,transparent)}
+.dec{position:fixed;font-size:2.6rem;opacity:.85;pointer-events:none;animation:fl 6s ease-in-out infinite;z-index:0}
+@keyframes fl{50%{transform:translateY(-12px) rotate(6deg)}}
+main{position:relative;z-index:1;max-width:980px;margin:auto}
+h1{text-align:center;font-size:clamp(1.9rem,6vw,3rem);text-shadow:0 4px 0 #5a2db3,0 8px 16px #0007;line-height:1.1}
+.sub{text-align:center;color:#ffe58a;margin:8px 0 18px;font-weight:700}
+.wrap{display:grid;grid-template-columns:1fr;gap:20px;align-items:start}
+@media(min-width:860px){.wrap{grid-template-columns:1fr 1fr}}
+.track{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:#0e0a4a99;border:4px solid #ffb703;border-radius:26px;padding:12px;box-shadow:0 12px 30px #0008;max-width:460px;margin:auto;width:100%}
+.cell{aspect-ratio:1;border-radius:18px;background:linear-gradient(#fff6d6,#ffe6a0);border:4px solid #ffb703;color:#5a2db3;font-weight:900;font-size:1.5rem;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 4px 0 #b97800}
+.cell.t2{color:#0aa5a5}.cell.t3{color:#d4326d}
+.cell.done{background:linear-gradient(#c9f7c0,#8fe39a);border-color:#2fb65a}
+.cell.fin{background:linear-gradient(#ffd23f,#ff9f1c);font-size:2rem}
+.cell small{position:absolute;left:6px;top:2px;font-size:.7rem;opacity:.8}
+.tok{position:absolute;inset:4px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8ad0,#d4326d);display:grid;place-items:center;font-size:2rem;line-height:1;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000;border:3px solid #fff;box-shadow:0 4px 10px #0007;animation:hop .5s}
+@keyframes hop{0%{transform:scale(.3) translateY(-20px)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.card{background:linear-gradient(#fff,#f3ecff);color:#26214d;border-radius:28px;padding:20px;border:5px solid #8e5fe0;box-shadow:0 10px 0 #5a2db3,0 18px 30px #0008}
+.top{display:flex;justify-content:space-between;font-weight:800;color:#5a2db3;font-size:.95rem}
+.bar{height:12px;border-radius:8px;background:#e2d6ff;margin:6px 0 14px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2fb65a,#ffd23f);transition:width .4s}
+.pimg{width:130px;height:130px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;font-size:5.2rem;line-height:1;animation:fl 5s ease-in-out infinite}
+.pimg.w{background:#6a4fb3}.pimg.w span{color:#fff;text-shadow:0 0 3px #000,0 0 3px #000,0 3px 5px #000}
+.pimg.k{background:#ffe6a0;border:4px solid #ffb703}.pimg.k span{color:#1d1840}
+.pimg.e{background:#e2d6ff;font-size:4.2rem}
+.q{font-size:1.3rem;font-weight:800;text-align:center;margin-bottom:14px}
+.opts{display:grid;gap:10px}
+.opt{font:700 1.05rem inherit;font-family:inherit;color:#26214d;background:#fff;border:4px solid #b79cf0;border-radius:18px;padding:13px 14px;cursor:pointer;text-align:left;box-shadow:0 4px 0 #b79cf0;transition:.12s}
+.opt:active{transform:translateY(3px);box-shadow:0 1px 0 #b79cf0}
+.opt.ok{background:#c9f7c0;border-color:#2fb65a;box-shadow:0 4px 0 #2fb65a}
+.opt.no{background:#ffc9c9;border-color:#e63946;box-shadow:0 4px 0 #e63946}
+.opt:disabled{cursor:default}
+.fb{min-height:3.2em;margin-top:12px;font-weight:700;text-align:center}
+.btn{display:block;margin:12px auto 0;font:800 1.2rem inherit;font-family:inherit;border:0;border-radius:40px;padding:13px 34px;cursor:pointer;color:#3b2a00;background:linear-gradient(#ffd23f,#ff9f1c);box-shadow:0 6px 0 #c76b00,0 10px 18px #0004}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #c76b00}
+.res{text-align:center}.res .big{font-size:4rem}.res h2{font-size:1.9rem;margin:6px 0}
+.hide{display:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="st"></div>
+<span class="dec" style="left:3%;top:6%">🧙‍♀️</span><span class="dec" style="left:40%;top:2%;animation-delay:-2s">🦇</span><span class="dec" style="right:3%;bottom:8%;animation-delay:-3s">🎃</span><span class="dec" style="left:2%;bottom:6%;animation-delay:-1s">👻</span>
+<main>
+<h1>♟︎ Шахмат викторинасы</h1>
+<p class="sub">Сұрақтарға дұрыс жауап бер — жолда алға жүр! 🏰</p>
+<div class="wrap">
+<div class="track" id="track"></div>
+<div>
+<div class="card" id="qc">
+<div class="top"><span id="cnt"></span><span id="sc"></span></div>
+<div class="bar"><i id="pr"></i></div>
+<div class="pimg" id="img"></div>
+<div class="q" id="q"></div>
+<div class="opts" id="opts"></div>
+<div class="fb" id="fb"></div>
+<button class="btn hide" id="nx">Келесі ➜</button>
+</div>
+<div class="card res hide" id="rc"></div>
+</div>
+</div>
+</main>
+<script>
+var G={k:"♚",q:"♛",r:"♜",b:"♝",n:"♞",p:"♟"},N={k:"Патша",q:"Уәзір",r:"Тура",b:"Піл",n:"Ат",p:"Пешка"};
+function pc(t){return "<span>"+G[t]+"\uFE0E</span>"}
+function sh(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function nameQ(t,w){var o=sh(Object.keys(N).filter(function(x){return x!=t})).slice(0,3).map(function(x){return N[x]});
+ return {q:"Бұл фигура қалай аталады?",p:[t,w],o:[N[t]].concat(o),e:"Бұл — "+N[t].toLowerCase()+"."}}
+var Q=[nameQ("k",1),nameQ("q",0),nameQ("r",1),nameQ("b",0),nameQ("n",1),nameQ("p",0),
+{q:"Бұл фигура қалай жүреді?",p:["n",1],o:["«Г» әрпі тәрізді","Тек диагональ бойынша","Тек тік және көлденең","Тек бір шаршы алға"],e:"Ат «Г» әрпі тәрізді жүреді: екі шаршы бір бағытта, бір шаршы бүйірге."},
+{q:"Бұл фигура қалай жүреді?",p:["r",0],o:["Тік және көлденең бағытта","«Г» әрпі тәрізді","Тек диагональ бойынша","Кез келген бағытта бір шаршы"],e:"Тура тік және көлденең бағытта жүреді."},
+{q:"Патша қалай жүреді?",p:["k",1],o:["Кез келген бағытта бір шаршы","Қалаған шаршыға дейін диагональмен","«Г» әрпі тәрізді","Тек алға қарай"],e:"Патша кез келген бағытта тек бір шаршы жүреді."},
+{q:"Уәзірдің құны қанша?",p:["q",1],o:["9 пешка","5 пешка","3 пешка","1 пешка"],e:"Уәзір — ең күшті фигура, құны 9 пешка."},
+{q:"Пешка алғашқы жүрісінде неше шаршы жүре алады?",p:["p",1],o:["1 немесе 2 шаршы","Тек 3 шаршы","Тек 1 шаршы","4 шаршы"],e:"Алғашқы жүрісінде жол бос болса, пешка 1 немесе 2 шаршы жүре алады."},
+{q:"Шахмат тақтасында неше шаршы бар?",i:"🔲",o:["64","32","48","100"],e:"8 қатар × 8 баған = 64 шаршы."},
+{q:"Ойын басында әр ойыншының оң жақ төменгі бұрышында қандай шаршы болады?",i:"📐",o:["Ақ шаршы","Қара шаршы"],e:"Тақта оң жақ төменгі бұрышта ақ шаршы болатындай қойылады."},
+{q:"Қай фигура басқа фигуралардың үстінен секіре алады?",i:"🦘",o:["Ат","Тура","Піл","Уәзір"],e:"Тек ат басқа фигуралардың үстінен секіре алады."},
+{q:"Шахмат қай елде пайда болған деп есептеледі?",i:"🌏",o:["Үндістан","Жапония","Ресей","Бразилия"],e:"Көптеген тарихшылар шахматтың отаны — Үндістан деп есептейді."}];
+var qi=0,pos=1,score=0,AC=null,$=function(i){return document.getElementById(i)};
+/* жол: төменнен жоғары, жыландай */
+var rows=[[16,15,14,13],[9,10,11,12],[8,7,6,5],[1,2,3,4]];
+function board(){var h="";rows.forEach(function(r){r.forEach(function(n){h+='<div class="cell t'+(n%3+1)+(n<pos?" done":"")+(n==16?" fin":"")+'">'+(n==16?"👑":n)+(n==pos?'<div class="tok">♞︎</div>':"")+"</div>"})});$("track").innerHTML=h}
+function snd(ok){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.resume)AC.resume();var t=AC.currentTime;
+ function tn(f,s,d,ty,v){var o=AC.createOscillator(),g=AC.createGain();o.type=ty;o.frequency.value=f;g.gain.setValueAtTime(v,t+s);g.gain.exponentialRampToValueAtTime(.001,t+s+d);o.connect(g);g.connect(AC.destination);o.start(t+s);o.stop(t+s+d)}
+ if(ok){tn(660,0,.2,"sine",.35);tn(990,.14,.35,"sine",.35)}else{tn(180,0,.4,"sawtooth",.25);tn(120,.18,.5,"sawtooth",.25)}}catch(e){}}
+function show(){var o=Q[qi];board();
+ $("cnt").textContent="Сұрақ "+(qi+1)+" / "+Q.length;$("sc").textContent="⭐ "+score;$("pr").style.width=(qi/Q.length*100)+"%";
+ $("img").className="pimg "+(o.p?(o.p[1]?"w":"k"):"e");$("img").innerHTML=o.p?pc(o.p[0]):o.i;
+ $("q").textContent=o.q;$("fb").textContent="";$("nx").classList.add("hide");
+ $("opts").innerHTML=sh(o.o).map(function(t){return '<button class="opt">'+t+"</button>"}).join("")}
+$("opts").addEventListener("click",function(e){var b=e.target.closest(".opt");if(!b||b.disabled)return;
+ var o=Q[qi],ok=b.textContent==o.o[0];
+ $("opts").querySelectorAll(".opt").forEach(function(x){x.disabled=true;if(x.textContent==o.o[0])x.classList.add("ok")});
+ if(ok){score++;pos++;snd(1);$("fb").innerHTML="✅ Дұрыс! "+o.e+" Алға жүрдің!"}
+ else{b.classList.add("no");snd(0);$("fb").innerHTML="❌ Қате. "+o.e}
+ $("sc").textContent="⭐ "+score;board();$("nx").textContent=qi==Q.length-1?"Нәтижені көру 🏆":"Келесі ➜";$("nx").classList.remove("hide")});
+$("nx").onclick=function(){qi++;if(qi<Q.length)show();else fin()};
+function fin(){var m=score>=14?["👑","Шахмат шебері!"]:score>=10?["🌟","Керемет нәтиже!"]:score>=6?["👍","Жақсы бастама!"]:["💪","Тағы бір рет байқап көр!"];
+ $("qc").classList.add("hide");board();$("rc").classList.remove("hide");
+ $("rc").innerHTML='<div class="big">'+m[0]+'</div><h2>'+m[1]+'</h2><p>Дұрыс жауап: <b>'+score+' / '+Q.length+'</b></p><p>Жолдағы орның: <b>'+pos+'-шаршы</b></p><button class="btn" id="again">Қайта ойнау 🔄</button>';
+ $("again").onclick=function(){qi=0;pos=1;score=0;$("rc").classList.add("hide");$("qc").classList.remove("hide");show()}}
+show();
+</script>
+</body>
+</html>
